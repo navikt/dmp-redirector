@@ -1,0 +1,15 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: dmp-redirector
+  namespace: nada
+  labels:
+    team: nada
+spec:
+  image: {{ image }}
+  replicas:
+    min: 2
+    max: 3
+    cpuThresholdPercentage: 70
+  ingresses:
+    - https://data.intern.nav.no
