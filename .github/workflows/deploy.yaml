@@ -41,7 +41,7 @@ jobs:
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/dev.yaml
-          VAR: image=${{ needs.build-and-push-dev.outputs.image }}
+          VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/nada/dmp-redirector:${{ github.sha }}-dev
 
   build-and-push-prod:
     name: Build and push GAR
@@ -75,4 +75,4 @@ jobs:
         env:
           CLUSTER: prod-gcp
           RESOURCE: .nais/prod.yaml
-          VAR: image=${{ needs.build-and-push-prod.outputs.image }}
+          VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/nada/dmp-redirector:${{ github.sha }}-prod
