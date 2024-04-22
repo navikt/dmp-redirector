@@ -13,6 +13,6 @@ spec:
     cpuThresholdPercentage: 70
   env:
     - name: NADA_HOST
-      value: data.ansatt.dev.nav.no
+      value: data.ansatt.nav.no
   ingresses:
     - https://data.intern.nav.no
