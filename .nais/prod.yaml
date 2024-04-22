@@ -12,7 +12,9 @@ spec:
     max: 3
     cpuThresholdPercentage: 70
   env:
-    - name: HOST
+    - name: NGINX_ENVSUBST_FILTER
+      value: NADA_
+    - name: NADA_HOST
       value: data.ansatt.dev.nav.no
   ingresses:
     - https://data.intern.nav.no
