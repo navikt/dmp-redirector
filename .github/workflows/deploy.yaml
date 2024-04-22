@@ -27,15 +27,29 @@ jobs:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
 
   deploy-dev:
-    name: Deploy dev gcp
+    name: Deploy dev
     runs-on: ubuntu-20.04
     needs: [build-and-push]
     if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy to dev-gcp
+      - name: Deploy to dev
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/dev.yaml
+          VAR: image=${{ needs.build-and-push.outputs.image }}
+
+  deploy-prod:
+    name: Deploy prod
+    runs-on: ubuntu-20.04
+    needs: [build-and-push,deploy-dev]
+    if: github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to prod
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: .nais/prod.yaml
           VAR: image=${{ needs.build-and-push.outputs.image }}

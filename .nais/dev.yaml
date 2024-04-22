@@ -11,5 +11,8 @@ spec:
     min: 2
     max: 3
     cpuThresholdPercentage: 70
+  env:
+    - name: HOST
+      value: data.ansatt.dev.nav.no
   ingresses:
     - https://data.intern.dev.nav.no
