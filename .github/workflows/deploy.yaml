@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-push:
+  build-and-push-dev:
     name: Build and push GAR
     runs-on: ubuntu-20.04
     if: github.actor != 'dependabot[bot]'
@@ -23,13 +23,15 @@ jobs:
         id: docker-build-push
         with:
           team: nada
+          build_args: |
+            nginxfile=nginx.dev.conf 
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
 
   deploy-dev:
     name: Deploy dev
     runs-on: ubuntu-20.04
-    needs: [build-and-push]
+    needs: [build-and-push-dev]
     if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v4
@@ -38,12 +40,31 @@ jobs:
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/dev.yaml
-          VAR: image=${{ needs.build-and-push.outputs.image }}
+          VAR: image=${{ needs.build-and-push-dev.outputs.image }}
+
+  build-and-push-prod:
+    name: Build and push GAR
+    runs-on: ubuntu-20.04
+    needs: [deploy-dev]
+    if: github.actor != 'dependabot[bot]'
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Push docker image to GAR
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: nada
+          build_args: |
+            nginxfile=nginx.prod.conf
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
 
   deploy-prod:
     name: Deploy prod
     runs-on: ubuntu-20.04
-    needs: [build-and-push,deploy-dev]
+    needs: [build-and-push-prod]
     if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v4
@@ -52,4 +73,4 @@ jobs:
         env:
           CLUSTER: prod-gcp
           RESOURCE: .nais/prod.yaml
-          VAR: image=${{ needs.build-and-push.outputs.image }}
+          VAR: image=${{ needs.build-and-push-prod.outputs.image }}
